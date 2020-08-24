@@ -22,6 +22,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public abstract class RestService {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(RestService.class);
+	
+	@Autowired
+	private RestTemplate restTemplate;
 
 	public abstract String getUrl();
 
@@ -46,8 +49,6 @@ public abstract class RestService {
 
 		try {
 			
-			RestTemplate restTemplate = new RestTemplate();
-
 			HttpHeaders headers = new HttpHeaders();
 			headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 			HttpEntity<String> entity = new HttpEntity<String>(headers);

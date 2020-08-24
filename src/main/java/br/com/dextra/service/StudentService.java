@@ -73,7 +73,7 @@ public class StudentService extends RestService{
 		Map<String, Object> urlParam = new HashMap<>();
 		urlParam.put(HOUSE_ID, dto.getHouse());
 		
-		HouseResponseDTO[] response = (HouseResponseDTO[]) get(buildUrlWithKey(GET_HOUSE_BY_ID, urlParam), HouseResponseDTO[].class);
+		HouseResponseDTO[] response = (HouseResponseDTO[]) this.get(this.buildUrlWithKey(GET_HOUSE_BY_ID, urlParam), HouseResponseDTO[].class);
 		
 		if(ObjectUtils.isEmpty(response)) {
 			throw new HouseNotFoundException("Informed House Dont Exists");
