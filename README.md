@@ -1,6 +1,6 @@
 # teste-dextra
 
-Aplicação rodando com java 11.
+Aplicação rodando em java 11.
 
 Instruções de uso:
 
