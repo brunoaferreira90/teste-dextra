@@ -4,7 +4,7 @@ Aplicação rodando em java 11.
 
 Instruções de uso:
 
-Executar os comando:
+Executar o comando:
 - mvn clean install
 
 e para subir a aplicação: 
