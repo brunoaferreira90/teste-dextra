@@ -1,4 +1,4 @@
-package br.com.dextra;
+package br.com.dextra.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

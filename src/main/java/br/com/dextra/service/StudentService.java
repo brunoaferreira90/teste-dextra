@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -23,10 +24,14 @@ import br.com.dextra.repository.StudentRepository;
 @Service
 public class StudentService extends RestService{
 	
+	private static final String INFORMED_HOUSE_NOT_FOUND = "Informed House not found";
+
+	private static final String INFORMED_STUDENT_NOT_FOUND = "Informed Student not found";
+
 	private static final String HOUSE_ID = "houseId";
 
 	private static final String GET_HOUSE_BY_ID = "/houses/{houseId}";
-
+	
 	@Autowired
 	private StudentRepository repository;
 	
@@ -58,7 +63,7 @@ public class StudentService extends RestService{
 	public StudentDTO update(Long id, StudentDTO dto){
 		
 		repository.findById(id).orElseThrow(
-				() -> new StudentNotFoundException("Informed Student dont Exists"));
+				() -> new StudentNotFoundException(INFORMED_STUDENT_NOT_FOUND));
 		
 		validateHouse(dto);
 		
@@ -76,7 +81,7 @@ public class StudentService extends RestService{
 		HouseResponseDTO[] response = (HouseResponseDTO[]) this.get(this.buildUrlWithKey(GET_HOUSE_BY_ID, urlParam), HouseResponseDTO[].class);
 		
 		if(ObjectUtils.isEmpty(response)) {
-			throw new HouseNotFoundException("Informed House Dont Exists");
+			throw new HouseNotFoundException(INFORMED_HOUSE_NOT_FOUND);
 		}
 	}
 
@@ -84,7 +89,7 @@ public class StudentService extends RestService{
 	@CacheEvict(value = {"cacheGetByHouse", "cacheGetById"}, allEntries = true)
 	public void delete(Long id) {
 		Student entity = repository.findById(id).orElseThrow(
-				() -> new StudentNotFoundException("Informed Student dont Exists"));
+				() -> new StudentNotFoundException(INFORMED_STUDENT_NOT_FOUND));
 		
 		repository.delete(entity);
 	}
@@ -102,7 +107,7 @@ public class StudentService extends RestService{
 	public StudentDTO getById(Long id) {
 		
 		Student entity = repository.findById(id).orElseThrow(
-				() -> new StudentNotFoundException("Informed Student dont Exists"));
+				() -> new StudentNotFoundException(INFORMED_STUDENT_NOT_FOUND));
 		
 		return StudentBuilder.entityToDto(entity);
 	}

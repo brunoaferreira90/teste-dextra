@@ -55,8 +55,6 @@ public abstract class RestService {
 
 			ResponseEntity<String> response = restTemplate.exchange(urlWithKey, HttpMethod.GET, entity, String.class);
 
-			LOG.info("Executando chamada Rest para ", urlWithKey);
-			
 			if(response.getStatusCode().is2xxSuccessful()) {
 				return new ObjectMapper().readValue(response.getBody(), object);
 			} 
@@ -66,8 +64,6 @@ public abstract class RestService {
 		} catch (Exception e) {
 			
 			//Tratamento genérico pois a API está retornando 200 com um objeto diferente do esperado ao invés de um objeto vazio
-
-			LOG.info("Problema ao chamada pesquisa ", urlWithKey);
 
 			return null;
 		}
