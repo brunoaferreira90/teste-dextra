@@ -36,7 +36,6 @@ public class StudentService extends RestService{
 	@Value(value = "${potterapi.url}")
 	private String url;
 	
-	@Cacheable(value = "cacheGetAll")
 	public List<StudentDTO> getAll() {
 		
 		return repository.findAll().stream()
@@ -45,7 +44,7 @@ public class StudentService extends RestService{
 				.collect(Collectors.toList());
 	}
 	
-	@CacheEvict(value = {"cacheGetAll", "cacheGetByHouse", "cacheGetById"})
+	@CacheEvict(value = {"cacheGetByHouse", "cacheGetById"}, allEntries = true)
 	public StudentDTO create(StudentDTO dto){
 		
 		validateHouse(dto);
@@ -55,7 +54,7 @@ public class StudentService extends RestService{
 		return StudentBuilder.entityToDto(studentCreated);
 	}
 	
-	@CacheEvict(value = {"cacheGetAll", "cacheGetByHouse", "cacheGetById"})
+	@CacheEvict(value = {"cacheGetByHouse", "cacheGetById"}, allEntries = true)
 	public StudentDTO update(Long id, StudentDTO dto){
 		
 		repository.findById(id).orElseThrow(
@@ -82,7 +81,7 @@ public class StudentService extends RestService{
 	}
 
 
-	@CacheEvict(value = {"cacheGetAll", "cacheGetByHouse", "cacheGetById"})
+	@CacheEvict(value = {"cacheGetByHouse", "cacheGetById"}, allEntries = true)
 	public void delete(Long id) {
 		Student entity = repository.findById(id).orElseThrow(
 				() -> new StudentNotFoundException("Informed Student dont Exists"));

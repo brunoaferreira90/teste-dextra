@@ -46,7 +46,7 @@ public class StudentController {
 	}
 	
 	@ApiOperation(value = "Search Student by your House")
-	@GetMapping(params = "/house/{houseId}")
+	@GetMapping(value = "/house/{houseId}")
 	public ResponseEntity<List<StudentDTO>> getByHouseId(@PathVariable("houseId") String houseId) {
 		return ResponseEntity.ok(characterService.getByHouseId(houseId));
 	}
