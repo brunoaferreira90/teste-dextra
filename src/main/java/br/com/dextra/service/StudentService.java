@@ -3,14 +3,14 @@ package br.com.dextra.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 import br.com.dextra.builder.StudentBuilder;
 import br.com.dextra.dto.HouseResponseDTO;
@@ -36,20 +36,27 @@ public class StudentService extends RestService{
 	@Value(value = "${potterapi.url}")
 	private String url;
 	
-	public List<Student> getAll() {
-		return repository.findAll();
+	@Cacheable(value = "cacheGetAll")
+	public List<StudentDTO> getAll() {
+		
+		return repository.findAll().stream()
+				.filter(result -> !ObjectUtils.isEmpty(result))
+				.map(result -> StudentBuilder.entityToDto(result))
+				.collect(Collectors.toList());
 	}
 	
-	@HystrixCommand
-	public Student create(StudentDTO dto){
+	@CacheEvict(value = {"cacheGetAll", "cacheGetByHouse", "cacheGetById"})
+	public StudentDTO create(StudentDTO dto){
 		
 		validateHouse(dto);
 		
-		return repository.save(StudentBuilder.dtoToEntity(dto));
+		Student studentCreated = repository.save(StudentBuilder.dtoToEntity(dto));
+		
+		return StudentBuilder.entityToDto(studentCreated);
 	}
 	
-	@HystrixCommand
-	public Student update(Long id, StudentDTO dto){
+	@CacheEvict(value = {"cacheGetAll", "cacheGetByHouse", "cacheGetById"})
+	public StudentDTO update(Long id, StudentDTO dto){
 		
 		repository.findById(id).orElseThrow(
 				() -> new StudentNotFoundException("Informed Student dont Exists"));
@@ -58,43 +65,47 @@ public class StudentService extends RestService{
 		
 		dto.setId(id);
 		
-		return repository.save(StudentBuilder.dtoToEntity(dto));
+		Student studentUpdated = repository.save(StudentBuilder.dtoToEntity(dto));
+		
+		return StudentBuilder.entityToDto(studentUpdated);
 	}
 
 	private void validateHouse(StudentDTO dto) {
 		Map<String, Object> urlParam = new HashMap<>();
 		urlParam.put(HOUSE_ID, dto.getHouse());
 		
-		HouseResponseDTO[] response = (HouseResponseDTO[]) getListHouseResponseDTO(urlParam);
+		HouseResponseDTO[] response = (HouseResponseDTO[]) get(buildUrlWithKey(GET_HOUSE_BY_ID, urlParam), HouseResponseDTO[].class);
 		
 		if(ObjectUtils.isEmpty(response)) {
 			throw new HouseNotFoundException("Informed House Dont Exists");
 		}
 	}
 
-	@Cacheable(value = "cacheHouseResponseDTO")
-	private Object getListHouseResponseDTO(Map<String, Object> urlParam) {
-		return get(buildUrlWithKey(GET_HOUSE_BY_ID, urlParam), HouseResponseDTO[].class);
-	}
 
-
+	@CacheEvict(value = {"cacheGetAll", "cacheGetByHouse", "cacheGetById"})
 	public void delete(Long id) {
 		Student entity = repository.findById(id).orElseThrow(
 				() -> new StudentNotFoundException("Informed Student dont Exists"));
 		
 		repository.delete(entity);
+	}
+
+	@Cacheable(value = "cacheGetByHouse")	
+	public List<StudentDTO> getByHouseId(String houseId) {
+		return repository.findByHouse(houseId).stream()
+				.filter(result -> !ObjectUtils.isEmpty(result))
+				.map(result -> StudentBuilder.entityToDto(result))
+				.collect(Collectors.toList());
 	}
 
-	public List<Student> getByHouseId(String houseId) {
-		return repository.findByHouse(houseId);
-	}
-
-	public Student getById(Long id) {
+	
+	@Cacheable(value = "cacheGetById")
+	public StudentDTO getById(Long id) {
 		
 		Student entity = repository.findById(id).orElseThrow(
 				() -> new StudentNotFoundException("Informed Student dont Exists"));
 		
-		return entity;
+		return StudentBuilder.entityToDto(entity);
 	}
 	
 	

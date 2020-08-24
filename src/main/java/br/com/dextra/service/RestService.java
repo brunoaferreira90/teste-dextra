@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -19,6 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public abstract class RestService {
+	
+	@Autowired
+	private RestTemplate restTemplate;
 
 	private static final Logger LOG = LoggerFactory.getLogger(RestService.class);
 
@@ -44,8 +48,6 @@ public abstract class RestService {
 	public Object get(String urlWithKey, Class<?> object){
 
 		try {
-
-			RestTemplate restTemplate = new RestTemplate();
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));

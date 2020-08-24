@@ -14,16 +14,15 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.dextra.dto.StudentDTO;
-import br.com.dextra.model.Student;
 import br.com.dextra.service.StudentService;
 import io.swagger.annotations.ApiOperation;
 
@@ -34,36 +33,39 @@ public class StudentController {
 	@Autowired
 	private StudentService characterService;
 
+	@ApiOperation(value = "Search All Students")
 	@GetMapping
-	public ResponseEntity<List<Student>> getAll() {
+	public ResponseEntity<List<StudentDTO>> getAll() {
 		return ResponseEntity.ok(characterService.getAll());
 	}
 	
-	@GetMapping(params = "/{id}")
-	public ResponseEntity<Student> getById(@RequestParam Long id) {
+	@ApiOperation(value = "Search Student by your Id")
+	@GetMapping(value = "/{id}")
+	public ResponseEntity<StudentDTO> getById(@PathVariable("id") Long id) {
 		return ResponseEntity.ok(characterService.getById(id));
 	}
 	
+	@ApiOperation(value = "Search Student by your House")
 	@GetMapping(params = "/house/{houseId}")
-	public ResponseEntity<List<Student>> getByHouseId(@RequestParam String houseId) {
+	public ResponseEntity<List<StudentDTO>> getByHouseId(@PathVariable("houseId") String houseId) {
 		return ResponseEntity.ok(characterService.getByHouseId(houseId));
 	}
 
 	@ApiOperation(value = "Create a new Student")
 	@PostMapping
-	public ResponseEntity<Student> create(@Valid @RequestBody StudentDTO dto){
+	public ResponseEntity<StudentDTO> create(@Valid @RequestBody StudentDTO dto){
 		return ResponseEntity.ok(characterService.create(dto));
 	}
 	
 	@ApiOperation(value = "Update one Student")
-	@PutMapping(params = "/{id}")
-	public ResponseEntity<Student> update(@RequestParam Long id, @Valid @RequestBody StudentDTO dto){
+	@PutMapping(value = "/{id}")
+	public ResponseEntity<StudentDTO> update(@PathVariable("id") Long id, @Valid @RequestBody StudentDTO dto){
 		return ResponseEntity.ok(characterService.update(id, dto));
 	}
 	
 	@ApiOperation(value = "Delete one Student")
-	@DeleteMapping(params = "/{id}")
-	public ResponseEntity<?> delete(@RequestParam Long id){
+	@DeleteMapping(value = "/{id}")
+	public ResponseEntity<?> delete(@PathVariable("id") Long id){
 		return ResponseEntity.ok().build();
 	}
 

@@ -8,7 +8,6 @@ import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @EnableSwagger2
-@EnableCircuitBreaker
 @SpringBootApplication
 @EnableCaching
 public class HarrypotterApplication {
