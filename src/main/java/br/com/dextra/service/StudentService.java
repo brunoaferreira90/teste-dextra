@@ -9,21 +9,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import br.com.dextra.builder.StudentBuilder;
-import br.com.dextra.dto.HouseResponseDTO;
+import br.com.dextra.dto.HouseResource;
 import br.com.dextra.dto.StudentDTO;
 import br.com.dextra.exception.HouseNotFoundException;
 import br.com.dextra.exception.StudentNotFoundException;
+import br.com.dextra.feign.HouseClient;
 import br.com.dextra.model.Student;
 import br.com.dextra.repository.StudentRepository;
+import feign.Feign;
+import feign.Logger.Level;
+import feign.gson.GsonDecoder;
+import feign.gson.GsonEncoder;
+import feign.okhttp.OkHttpClient;
+import feign.slf4j.Slf4jLogger;
 
 @Service
 public class StudentService extends RestService{
-	
+
 	private static final String INFORMED_HOUSE_NOT_FOUND = "Informed House not found";
 
 	private static final String INFORMED_STUDENT_NOT_FOUND = "Informed Student not found";
@@ -75,12 +81,22 @@ public class StudentService extends RestService{
 	}
 
 	private void validateHouse(StudentDTO dto) {
-		Map<String, Object> urlParam = new HashMap<>();
-		urlParam.put(HOUSE_ID, dto.getHouse());
 		
-		HouseResponseDTO[] response = (HouseResponseDTO[]) this.get(this.buildUrlWithKey(GET_HOUSE_BY_ID, urlParam), HouseResponseDTO[].class);
+		HouseClient houseClient = Feign.builder()
+				  .client(new OkHttpClient())
+				  .encoder(new GsonEncoder())
+				  .decoder(new GsonDecoder())
+				  .logger(new Slf4jLogger(HouseClient.class))
+				  .logLevel(Level.FULL)
+				  .target(HouseClient.class, url);
 		
-		if(ObjectUtils.isEmpty(response)) {
+		Map<String, String> urlKey = new HashMap<>();
+		urlKey.put("key", token);
+		
+		List<HouseResource> findByHouse = houseClient.findByHouse(dto.getHouse(), urlKey);
+		
+		if(findByHouse.stream().anyMatch(r -> !ObjectUtils.isEmpty(r.getMessage()))
+				&& !findByHouse.stream().anyMatch(r -> !ObjectUtils.isEmpty(r.getName()))) {
 			throw new HouseNotFoundException(INFORMED_HOUSE_NOT_FOUND);
 		}
 	}
