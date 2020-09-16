@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class StudentDTO {
 	
-	private Long id;
+	private String id;
 	
 	@NotBlank(message = "Campo nome não pode ser vazio")
 	private String name;

@@ -34,10 +34,6 @@ public class StudentService extends RestService{
 
 	private static final String INFORMED_STUDENT_NOT_FOUND = "Informed Student not found";
 
-	private static final String HOUSE_ID = "houseId";
-
-	private static final String GET_HOUSE_BY_ID = "/houses/{houseId}";
-	
 	@Autowired
 	private StudentRepository repository;
 	
@@ -66,7 +62,7 @@ public class StudentService extends RestService{
 	}
 	
 	@CacheEvict(value = {"cacheGetByHouse", "cacheGetById"}, allEntries = true)
-	public StudentDTO update(Long id, StudentDTO dto){
+	public StudentDTO update(String id, StudentDTO dto){
 		
 		repository.findById(id).orElseThrow(
 				() -> new StudentNotFoundException(INFORMED_STUDENT_NOT_FOUND));
@@ -82,6 +78,8 @@ public class StudentService extends RestService{
 
 	private void validateHouse(StudentDTO dto) {
 		
+		try {
+		
 		HouseClient houseClient = Feign.builder()
 				  .client(new OkHttpClient())
 				  .encoder(new GsonEncoder())
@@ -95,15 +93,19 @@ public class StudentService extends RestService{
 		
 		List<HouseResource> findByHouse = houseClient.findByHouse(dto.getHouse(), urlKey);
 		
-		if(findByHouse.stream().anyMatch(r -> !ObjectUtils.isEmpty(r.getMessage()))
-				&& !findByHouse.stream().anyMatch(r -> !ObjectUtils.isEmpty(r.getName()))) {
+		if(findByHouse.isEmpty()) {
 			throw new HouseNotFoundException(INFORMED_HOUSE_NOT_FOUND);
 		}
+		
+		} catch (Exception e) {
+			throw new HouseNotFoundException(INFORMED_HOUSE_NOT_FOUND);
+		}
+		
 	}
 
 
 	@CacheEvict(value = {"cacheGetByHouse", "cacheGetById"}, allEntries = true)
-	public void delete(Long id) {
+	public void delete(String id) {
 		Student entity = repository.findById(id).orElseThrow(
 				() -> new StudentNotFoundException(INFORMED_STUDENT_NOT_FOUND));
 		
@@ -120,7 +122,7 @@ public class StudentService extends RestService{
 
 	
 	@Cacheable(value = "cacheGetById")
-	public StudentDTO getById(Long id) {
+	public StudentDTO getById(String id) {
 		
 		Student entity = repository.findById(id).orElseThrow(
 				() -> new StudentNotFoundException(INFORMED_STUDENT_NOT_FOUND));

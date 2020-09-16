@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class HouseResource extends ErrorResponse {
+public class HouseResource {
 	
 	private HouseResponseDTO houseResponse;
 

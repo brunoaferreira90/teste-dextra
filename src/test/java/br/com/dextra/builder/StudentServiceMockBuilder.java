@@ -15,7 +15,7 @@ public class StudentServiceMockBuilder {
 		student.setName(RandomStringUtils.random(1));
 		student.setRole(RandomStringUtils.random(1));
 		student.setSchool(RandomStringUtils.random(1));
-		student.setId(1L);
+		student.setId(RandomStringUtils.random(1));
 		
 		return student;
 		
@@ -28,7 +28,7 @@ public class StudentServiceMockBuilder {
 		studentDTO.setName(RandomStringUtils.random(1));
 		studentDTO.setRole(RandomStringUtils.random(1));
 		studentDTO.setSchool(RandomStringUtils.random(1));
-		studentDTO.setId(1L);
+		studentDTO.setId(RandomStringUtils.random(1));
 		
 		return studentDTO;
 		

@@ -41,7 +41,7 @@ public class StudentController {
 	
 	@ApiOperation(value = "Search Student by your Id")
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<StudentDTO> getById(@PathVariable("id") Long id) {
+	public ResponseEntity<StudentDTO> getById(@PathVariable("id") String id) {
 		return ResponseEntity.ok(characterService.getById(id));
 	}
 	
@@ -59,7 +59,7 @@ public class StudentController {
 	
 	@ApiOperation(value = "Update one Student")
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<StudentDTO> update(@PathVariable("id") Long id, @Valid @RequestBody StudentDTO dto){
+	public ResponseEntity<StudentDTO> update(@PathVariable("id") String id, @Valid @RequestBody StudentDTO dto){
 		return ResponseEntity.ok(characterService.update(id, dto));
 	}
 	
